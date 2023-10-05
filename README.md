@@ -14,7 +14,7 @@
 
 <a name="Usage"></a>
 ## Usage 
-- What the project is intended for and how can users use our project
+This project aims to address the following research question: Can a formal grammar be used to develop a grammar checker to identify agreement errors in IsiZulu?
 
 <a name="BuiltWith"></a>
 ## Built With
@@ -22,7 +22,7 @@ This project was built using the following applications and extensions:
 1. Python
 2. PyQT6 for the Graphical User Interface (GUI)
 3. REST.API
-4. ...
+4. NLTK Toolkit
 
 <a name="GettingStarted"></a>
 ## Getting Started
