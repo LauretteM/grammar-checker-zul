@@ -33,10 +33,14 @@ This project was built using the following applications and extensions:
 
 <a name="Authors"></a>
 ## Authors
+
+### Main authors
 (In alphabetical order)
 - Génevieve Chikwanha
-- Dr. Laurrette Marais
 - Roné Wierenga
+
+### Supervising author
+- Laurette Marais
 
 <a name="Acknowledgements"></a>
 ## Acknowledgements
