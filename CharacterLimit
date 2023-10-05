@@ -1,0 +1,33 @@
+from PyQt6.QtWidgets import QTextEdit, QColor
+
+class CharacterLimitedTextEdit(QTextEdit):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMaximumBlockCount(1)  # Allow only one line of text
+        self.setMaximumCharacterCount(1000)  # Set the maximum character count
+        self.word_limit_exceeded = False  # Track whether the word limit is exceeded
+
+    def keyPressEvent(self, event):
+        # Get the current text content
+        current_text = self.toPlainText()
+
+        # Check if the current text plus the new input will exceed the character limit
+        if len(current_text) + len(event.text()) <= 1000:
+            # Allow the key press if it doesn't exceed the limit
+            super().keyPressEvent(event)
+            
+            # Change the frame color to green when typing within the limit
+            self.setStyleSheet("border: 1px solid green;")
+            self.word_limit_exceeded = False
+        else:
+            # Ignore the key press if it would exceed the limit
+            event.ignore()
+
+            # Change the frame color to red when the limit is exceeded
+            self.setStyleSheet("border: 1px solid red;")
+            self.word_limit_exceeded = True
+
+    def clearError(self):
+        # Clear the error state (change frame color to green)
+        self.setStyleSheet("border: 1px solid green;")
+        self.word_limit_exceeded = False
