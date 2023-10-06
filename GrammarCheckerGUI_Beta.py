@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QDialog
 from PyQt6.QtGui import QFont, QColor, QTextCursor, QTextCharFormat, QPalette, QTextBlockFormat
 from PyQt6.QtCore import Qt
 
@@ -34,7 +34,7 @@ class GrammarCheckerApp(QMainWindow):
         title_label = QLabel("isiZulu Grammar Checker", self)
 
         # Create a QFont object using "Inter" font family
-        title_font = QFont("Helvetica Neue", 50)
+        title_font = QFont("Helvetica Neue", 45)
         title_font.setBold(True)
         title_label.setFont(title_font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -58,7 +58,7 @@ class GrammarCheckerApp(QMainWindow):
         """)
 
         # Create a layout for the input text area and button
-        input_layout = QVBoxLayout()
+        input_layout = QHBoxLayout()
 
         # Create a text input area (QTextEdit) for input text
         self.input_text_edit = QTextEdit (self) #grammartextedit
@@ -82,7 +82,20 @@ class GrammarCheckerApp(QMainWindow):
         input_area_shadow.setYOffset(7)
         self.input_text_edit.setGraphicsEffect(input_area_shadow)
 
-        # input_layout.addWidget(self.input_text_edit)
+        input_layout.addWidget(self.input_text_edit, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        """
+        Create a dynamic "Suggestions section.
+        """
+
+        self.suggestions_layout = QVBoxLayout()
+        self.suggestions = []
+
+        """
+        Create a button to check grammar text.
+        """
+
+        buttons_layout = QVBoxLayout()
 
         # Create a button for grammar check with an icon
         self.check_button = QPushButton("Check my grammar")
@@ -107,11 +120,11 @@ class GrammarCheckerApp(QMainWindow):
             }
             """
         )
-        self.check_button.clicked.connect(self.grammar_check)
+        self.check_button.clicked.connect(self.suggestion)
 
-        input_layout.addWidget(self.input_text_edit, alignment=Qt.AlignmentFlag.AlignCenter)
-        input_layout.addWidget(self.check_button)
-
+        """
+        Add a clear all button
+        """
        
         self.clearAll_button = QPushButton("Clear text", self)
     
@@ -138,15 +151,71 @@ class GrammarCheckerApp(QMainWindow):
         )
         self.clearAll_button.clicked.connect(self.clear_text)
 
-        input_layout.addWidget(self.clearAll_button)
+        buttons_layout.addWidget(self.check_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        buttons_layout.addWidget(self.clearAll_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Add the title label, input layout, and output layout to the main layout
         main_layout.addWidget(title_label)
         main_layout.addWidget(description_label)
         main_layout.addLayout(input_layout)
+        main_layout.addLayout(self.suggestions_layout)
+        main_layout.addLayout(buttons_layout)
 
         # Set the layout for the central widget
+        
         central_widget.setLayout(main_layout)
+
+    # Dummy suggestion code 
+    def suggestion(self):
+        suggestions_text = ["Does your verb agree with your noun?"]
+        for suggestion_text in suggestions_text:
+            self.add_suggestions(suggestion_text)
+
+    def add_suggestions(self, suggestion_text):
+        suggestion_box = QWidget()
+        suggestions_layout = QHBoxLayout()
+        suggestion_label = QLabel(suggestion_text)
+        reject_button = QPushButton("Reject")
+        report_button = QPushButton("Report")
+
+        reject_button.clicked.connect(lambda: self.remove_suggestion(suggestion_box))
+        report_button.clicked.connect(lambda: self.report_suggestion(suggestion_text))
+
+        suggestions_layout.addWidget(suggestion_label)
+        suggestions_layout.addWidget(reject_button)
+        suggestions_layout.addWidget(report_button)
+        suggestion_box.setLayout(suggestions_layout)
+
+        self.suggestions_layout.addWidget(suggestion_box)
+        self.suggestions.append(suggestion_box)
+
+    def remove_suggestion(self, suggestion_box):
+        self.suggestions_layout.removeWidget(suggestion_box)
+        suggestion_box.deleteLater()
+        self.suggestions.remove(suggestion_box)
+
+    def report_suggestion(self, suggestion_text):
+        report_dialogue = ReportDialogue(suggestion_text)
+        report_dialogue.exec()
+
+    def clear_text(self):
+        self.input_text_edit.clear()
+
+class ReportDialogue(QDialog):
+    def __init__(self, suggestion_text):
+        super().__init__()
+
+        # Create a dialog to report the suggestion (customize as needed)
+        self.setWindowTitle("Report Suggestion")
+        layout = QVBoxLayout()
+        label = QLabel("Please select the error:")
+        report_button = QPushButton("Report")
+        report_button.clicked.connect(self.accept)
+
+        layout.addWidget(label)
+        layout.addWidget(report_button)
+        self.setLayout(layout)
+
 
     # def check_grammar(self):
     #     # Get the text from the input area
@@ -165,28 +234,30 @@ class GrammarCheckerApp(QMainWindow):
     #     # Display the result or suggestions in the output text area
     #     self.output_text_edit.setPlainText(result_text)
 
-    def grammar_check(self):
-        user_input = self.input_text_edit.toPlainText()
-        words = user_input.split()
 
-        for word in words:
-            if not self.word_correct(word):
-                self.incorrect_underline(word)
+    """
+    Dummy code for grammar check and underline features
+    """
+    # def grammar_check(self):
+    #     user_input = self.input_text_edit.toPlainText()
+    #     words = user_input.split()
 
-    def word_correct(self, word):
-        return False
+    #     for word in words:
+    #         if not self.word_correct(word):
+    #             self.incorrect_underline(word)
+
+    # def word_correct(self, word):
+    #     return False
     
-    def incorrect_underline(self, word):
-        cursor = self.input_text_edit.textCursor()
-        format = QTextCharFormat()
-        format.setUnderlineColor(QColor("red"))  # Set the underline color to red
-        format.setUnderlineStyle(QTextCharFormat.UnderlineStyle.DashUnderline)  # Set the underline style
-        cursor.setPosition(self.input_text_edit.toPlainText().index(word))
-        cursor.setPosition(cursor.position() + len(word), QTextCursor.MoveMode.KeepAnchor)
-        cursor.mergeCharFormat(format)
+    # def incorrect_underline(self, word):
+    #     cursor = self.input_text_edit.textCursor()
+    #     format = QTextCharFormat()
+    #     format.setUnderlineColor(QColor("red"))  # Set the underline color to red
+    #     format.setUnderlineStyle(QTextCharFormat.UnderlineStyle.DashUnderline)  # Set the underline style
+    #     cursor.setPosition(self.input_text_edit.toPlainText().index(word))
+    #     cursor.setPosition(cursor.position() + len(word), QTextCursor.MoveMode.KeepAnchor)
+    #     cursor.mergeCharFormat(format)
 
-    def clear_text(self):
-        self.input_text_edit.clear()
 
 def main():
     app = QApplication(sys.argv)
