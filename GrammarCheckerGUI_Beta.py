@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
 
@@ -89,8 +89,8 @@ class GrammarCheckerApp(QMainWindow):
         self.input_text_edit = QTextEdit(self)
         input_text_font = QFont("Helvetica Neue", 16)
         self.input_text_edit.setFont(input_text_font)
-        self.input_text_edit.setFixedWidth(600)  # Set a fixed width
-        self.input_text_edit.setFixedHeight(250)  # Set a fixed height
+        self.input_text_edit.setFixedWidth(500)  # Set a fixed width
+        self.input_text_edit.setFixedHeight(150)  # Set a fixed height
         self.input_text_edit.setStyleSheet(
             """
             color: black;
@@ -110,7 +110,7 @@ class GrammarCheckerApp(QMainWindow):
         self.input_text_edit.setGraphicsEffect(input_area_shadow)
 
         # Align input widget to the center of the screen
-        input_widget_layout.addWidget(self.input_text_edit, alignment=Qt.AlignmentFlag.AlignCenter)
+        input_widget_layout.addWidget(self.input_text_edit)
 
         """
         Create a button to check the grammar
@@ -158,15 +158,15 @@ class GrammarCheckerApp(QMainWindow):
         """
 
         # Create a layout for the output text area
-        output_layout = QVBoxLayout()
+        output_layout = QHBoxLayout()
 
         # Create a text output area (QTextEdit) for displaying results or suggestions
         self.output_text_edit = QTextEdit(self)
         output_text_font = QFont("Helvetica Neue", 16)
         self.output_text_edit.setFont(output_text_font)
         self.output_text_edit.setReadOnly(True)  # Make it read-only
-        self.output_text_edit.setFixedWidth(600)  # Set a fixed width
-        self.output_text_edit.setFixedHeight(250)  # Set a fixed height
+        self.output_text_edit.setFixedWidth(500)  # Set a fixed width
+        self.output_text_edit.setFixedHeight(150)  # Set a fixed height
         self.output_text_edit.setStyleSheet(
             """
             color: black;
@@ -185,6 +185,36 @@ class GrammarCheckerApp(QMainWindow):
         output_area_shadow.setXOffset(7)
         output_area_shadow.setYOffset(7)
         self.output_text_edit.setGraphicsEffect(output_area_shadow)
+
+        # Create the second text output area for additional content (adjust dimensions as needed)
+        self.additional_text_edit = QTextEdit(self)
+        additional_text_font = QFont("Helvetica Neue", 16)
+        self.additional_text_edit.setFont(additional_text_font)
+        self.additional_text_edit.setReadOnly(True)  # Make it read-only
+        self.additional_text_edit.setFixedWidth(500)  # Set a fixed width
+        self.additional_text_edit.setFixedHeight(150)  # Set a fixed height
+        self.additional_text_edit.setStyleSheet(
+            """
+            color: black;
+            background-color: white;
+            border: 0.5px solid #808080;
+            border-radius: 10px; /* Create rounded corners */
+            padding: 40px; /* Add some padding for space */
+            font-size: 16px;
+            """
+        )
+
+        # Create a 3D "shadow effect" behind the second textbox
+        additional_area_shadow = QGraphicsDropShadowEffect(self)
+        additional_area_shadow.setColor(QColor(128, 128, 128, 200))
+        additional_area_shadow.setBlurRadius(20)
+        additional_area_shadow.setXOffset(7)
+        additional_area_shadow.setYOffset(7)
+        self.additional_text_edit.setGraphicsEffect(additional_area_shadow)
+
+        # Add both text areas to the output layout
+        output_layout.addWidget(self.output_text_edit)
+        output_layout.addWidget(self.additional_text_edit)
 
         #output_layout.addWidget(self.output_text_edit, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -249,18 +279,8 @@ class GrammarCheckerApp(QMainWindow):
         # Connect the clear_text function to the clearAll_button when clicked
         self.clearAll_button.clicked.connect(self.clear_text)
 
-        # Add clear_All button to the output area
-        output_layout.addWidget(self.clearAll_button)
-
-        """
-        Add widgets to the main layout
-        """
-
-        # Add the title label, input layout, and output layout to the main layout
-        main_layout.addWidget(title_label)
-        main_layout.addWidget(description_label)
-        main_layout.addLayout(input_layout)
-        main_layout.addLayout(output_layout)
+        # # Add clear_All button to the output area
+        # output_layout.addWidget(self.clearAll_button)
 
         """
         Creating two widgets on the main layout
@@ -287,7 +307,11 @@ class GrammarCheckerApp(QMainWindow):
         top_layout.addWidget(self.check_button)
 
         bottom_layout.addWidget(self.output_text_edit, alignment=Qt.AlignmentFlag.AlignCenter)
-        bottom_layout.addWidget(self.clearAll_button)
+        bottom_layout.addWidget(self.additional_text_edit, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        button_layout = QVBoxLayout()
+        button_layout.addWidget(self.clearAll_button)
+        bottom_layout.addLayout(button_layout)
 
         # Set layouts for top and bottom halves
         top_half_widget.setLayout(top_layout)
