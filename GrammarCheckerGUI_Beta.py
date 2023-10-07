@@ -185,24 +185,40 @@ class GrammarCheckerApp(QMainWindow):
         
         central_widget.setLayout(self.main_layout)
 
-        
 
     def init_suggestions_container(self):
         # Create the suggestions container
         self.suggestions_container = QGroupBox("Suggestions")
         self.suggestions_container_layout = QVBoxLayout()
+
         self.suggestions_container.setLayout(self.suggestions_container_layout)
         self.suggestions_container.hide()
-
 
     # Dummy suggestion code 
     def suggestion(self):
         suggestions_text = ["Does your verb agree with your noun?"]
-        for suggestion_text in suggestions_text:
-            self.add_suggestions(suggestion_text)
+        #suggestions_text = []
+        
+        #self.clear_suggestions()
 
-        # Show the container after adding suggestions
-        self.suggestions_container.show()
+        if suggestions_text:
+        # There are suggestions, clear any previous content and show the container
+            for suggestion_text in suggestions_text:
+                self.add_suggestions(suggestion_text)
+                    # Show the container after adding suggestions
+            self.suggestions_container.show()
+
+        else:
+            self.suggestions_container.hide()
+            self.no_errors_message()
+            
+            # either show that there are no issues in the suggestions box OR add a pop up. Suggestions box might be cleaner at the end.
+
+    def no_errors_message(self):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle("No Errors Found")
+        msg_box.setText("No grammar errors were found in the text.")
+        msg_box.exec()
 
     def add_suggestions(self, suggestion_text):
         suggestion_box = QWidget()
@@ -250,6 +266,13 @@ class GrammarCheckerApp(QMainWindow):
         self.suggestions_layout.removeWidget(suggestion_box)
         suggestion_box.deleteLater()
         self.suggestions.remove(suggestion_box)
+    
+    def clear_suggestions(self):
+        # Clear any previous suggestions by removing widgets and clearing the list
+        for suggestion in self.suggestions:
+            self.suggestions_container_layout.removeWidget(suggestion)
+            suggestion.deleteLater()
+        self.suggestions.clear()
 
     def report_suggestion(self, suggestion_text):
         report_dialogue = ReportDialogue(suggestion_text)
@@ -257,6 +280,7 @@ class GrammarCheckerApp(QMainWindow):
 
     def clear_text(self):
         self.input_text_edit.clear()
+        self.suggestions_container.hide()
 
 class ReportDialogue(QDialog):
     def __init__(self, suggestion_text):
