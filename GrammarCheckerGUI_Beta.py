@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QDialog, QGroupBox
 from PyQt6.QtGui import QFont, QColor, QTextCursor, QTextCharFormat, QPalette, QTextBlockFormat
 from PyQt6.QtCore import Qt
 
@@ -28,9 +28,7 @@ class GrammarCheckerApp(QMainWindow):
         central_widget.setStyleSheet("background-color: white;")
 
         # Create a layout for the central widget
-        main_layout = QVBoxLayout()
-
-        # Create a container for input-related items
+        self.main_layout = QVBoxLayout()
 
         # Create a title label
         title_label = QLabel("isiZulu Grammar Checker", self)
@@ -59,7 +57,12 @@ class GrammarCheckerApp(QMainWindow):
 
         """)
 
+        # Create a container for input-related items
+        input_container = QGroupBox()
+        input_container_layout = QVBoxLayout()
+        input_container = QWidget(self)
         # Create a layout for the input text area and button
+
         input_layout = QHBoxLayout()
 
         # Create a text input area (QTextEdit) for input text
@@ -90,6 +93,9 @@ class GrammarCheckerApp(QMainWindow):
         Create a dynamic "Suggestions section.
         """
 
+        # suggestions_container = QGroupBox()
+        # suggestions_container_layout = QVBoxLayout()
+        # suggestions_container.hide()
         self.suggestions_layout = QVBoxLayout()
         self.suggestions = []
 
@@ -156,22 +162,47 @@ class GrammarCheckerApp(QMainWindow):
         buttons_layout.addWidget(self.check_button, alignment=Qt.AlignmentFlag.AlignCenter)
         buttons_layout.addWidget(self.clearAll_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        input_container_layout.addLayout(input_layout)
+        input_container_layout.addLayout(buttons_layout)
+        input_container.setLayout(input_container_layout)
+
+        self.init_suggestions_container()
+        
+        # Add the input container and suggestions container to the main layout side by side
+        horizontal_container = QHBoxLayout()
+        horizontal_container.addWidget(input_container)
+        horizontal_container.addWidget(self.suggestions_container)
+
         # Add the title label, input layout, and output layout to the main layout
-        main_layout.addWidget(title_label)
-        main_layout.addWidget(description_label)
-        main_layout.addLayout(input_layout)
-        main_layout.addLayout(self.suggestions_layout)
-        main_layout.addLayout(buttons_layout)
+        self.main_layout.addWidget(title_label)
+        self.main_layout.addWidget(description_label)
+        self.main_layout.addLayout(horizontal_container)
+        #main_layout.addLayout(input_layout)
+        #main_layout.addLayout(self.suggestions_layout)
+        #main_layout.addLayout(buttons_layout)
 
         # Set the layout for the central widget
         
-        central_widget.setLayout(main_layout)
+        central_widget.setLayout(self.main_layout)
+
+        
+
+    def init_suggestions_container(self):
+        # Create the suggestions container
+        self.suggestions_container = QGroupBox("Suggestions")
+        self.suggestions_container_layout = QVBoxLayout()
+        self.suggestions_container.setLayout(self.suggestions_container_layout)
+        self.suggestions_container.hide()
+
 
     # Dummy suggestion code 
     def suggestion(self):
         suggestions_text = ["Does your verb agree with your noun?"]
         for suggestion_text in suggestions_text:
             self.add_suggestions(suggestion_text)
+
+        # Show the container after adding suggestions
+        self.suggestions_container.show()
 
     def add_suggestions(self, suggestion_text):
         suggestion_box = QWidget()
@@ -212,7 +243,7 @@ class GrammarCheckerApp(QMainWindow):
         suggestions_layout.addWidget(report_button)
         suggestion_box.setLayout(suggestions_layout)
 
-        self.suggestions_layout.addWidget(suggestion_box)
+        self.suggestions_container_layout.addWidget(suggestion_box)
         self.suggestions.append(suggestion_box)
 
     def remove_suggestion(self, suggestion_box):
