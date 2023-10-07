@@ -30,6 +30,8 @@ class GrammarCheckerApp(QMainWindow):
         # Create a layout for the central widget
         main_layout = QVBoxLayout()
 
+        # Create a container for input-related items
+
         # Create a title label
         title_label = QLabel("isiZulu Grammar Checker", self)
 
@@ -175,10 +177,34 @@ class GrammarCheckerApp(QMainWindow):
         suggestion_box = QWidget()
         suggestions_layout = QHBoxLayout()
         suggestion_label = QLabel(suggestion_text)
-        reject_button = QPushButton("Reject")
-        report_button = QPushButton("Report")
+        
+        # Button formatting
+        suggestion_button = """
+            QPushButton {
+                background-color: white;
+                color: black;
+                border: 1px inset #666666;
+                border-radius: 10px;
+                padding: 10px;
+                margin-left: 20px;
+                margin-right: 20px;
+            }
 
+            QPushButton:hover {
+                background-color: #666666;
+            }
+            """
+        
+        button_font = QFont("Helvetica Neue", 10)           
+
+        reject_button = QPushButton("Reject")
+        reject_button.setFont(button_font)
+        reject_button.setStyleSheet(suggestion_button)
         reject_button.clicked.connect(lambda: self.remove_suggestion(suggestion_box))
+    
+        report_button = QPushButton("Report")
+        report_button.setFont(button_font)
+        report_button.setStyleSheet(suggestion_button)
         report_button.clicked.connect(lambda: self.report_suggestion(suggestion_text))
 
         suggestions_layout.addWidget(suggestion_label)
