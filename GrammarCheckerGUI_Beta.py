@@ -9,12 +9,12 @@ class GrammarCheckerApp(QMainWindow):
 
         # Set window title and dimensions
         self.setWindowTitle("isiZulu Grammar Checker")
-        window_width = 800
-        window_height = 450
+        window_width = 600
+        window_height = 550
 
         # Calculate center of user's screen
         user_screen = QApplication.primaryScreen()
-        screen_geometry = user_screen.geometry() # Access user's desktop and retrieve screen geometry
+        screen_geometry = user_screen.availableGeometry() # Access user's desktop and retrieve screen geometry
 
         x = (screen_geometry.width() - window_width) // 2 # Screen width - window width // 2
         y = (screen_geometry.height() - window_height) // 2 # Screen height - window height // 2
@@ -50,16 +50,18 @@ class GrammarCheckerApp(QMainWindow):
         description_font = QFont("Helvetica Neue", 16)
         description_label.setFont(description_font)
         description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        description_label.setStyleSheet("""
+        description_label.setStyleSheet(
+            """
             QLabel {
                 color: black;                
             }
-
-        """)
+            """
+        )
 
         # Create a container for input-related items
         input_container = QGroupBox()
         input_container_layout = QVBoxLayout()
+
         input_container = QWidget(self)
         # Create a layout for the input text area and button
 
@@ -190,7 +192,14 @@ class GrammarCheckerApp(QMainWindow):
         # Create the suggestions container
         self.suggestions_container = QGroupBox("Suggestions")
         self.suggestions_container_layout = QVBoxLayout()
-
+        self.suggestions_container.setStyleSheet(
+            """
+            QGroupBox {
+                border: 1px solid #CCCCCC;
+                border-radius: 5px;
+            }
+            """
+        )
         self.suggestions_container.setLayout(self.suggestions_container_layout)
         self.suggestions_container.hide()
 
@@ -224,6 +233,15 @@ class GrammarCheckerApp(QMainWindow):
         suggestion_box = QWidget()
         suggestions_layout = QHBoxLayout()
         suggestion_label = QLabel(suggestion_text)
+        suggestion_label.setStyleSheet(
+            """
+            QLabel {
+                color: #333333;
+                font-size: 14px;
+                margin: 5px
+            }
+            """
+        )
         
         # Button formatting
         suggestion_button = """
@@ -280,6 +298,7 @@ class GrammarCheckerApp(QMainWindow):
 
     def clear_text(self):
         self.input_text_edit.clear()
+        self.clear_suggestions()
         self.suggestions_container.hide()
 
 class ReportDialogue(QDialog):
