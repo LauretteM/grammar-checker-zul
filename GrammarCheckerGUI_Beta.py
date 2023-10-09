@@ -68,7 +68,7 @@ class GrammarCheckerApp(QMainWindow):
         input_layout = QHBoxLayout()
 
         # Create a text input area (QTextEdit) for input text
-        self.input_text_edit = QTextEdit (self) #grammartextedit
+        self.input_text_edit = QTextEdit (self)
         input_text_font = QFont("Helvetica Neue", 16)
         self.input_text_edit.setFont(input_text_font)
         self.input_text_edit.setFixedWidth(600)  # Set a fixed width
@@ -95,9 +95,6 @@ class GrammarCheckerApp(QMainWindow):
         Create a dynamic "Suggestions section.
         """
 
-        # suggestions_container = QGroupBox()
-        # suggestions_container_layout = QVBoxLayout()
-        # suggestions_container.hide()
         self.suggestions_layout = QVBoxLayout()
         self.suggestions = []
 
@@ -179,14 +176,16 @@ class GrammarCheckerApp(QMainWindow):
         self.main_layout.addWidget(title_label)
         self.main_layout.addWidget(description_label)
         self.main_layout.addLayout(horizontal_container)
-        #main_layout.addLayout(input_layout)
-        #main_layout.addLayout(self.suggestions_layout)
-        #main_layout.addLayout(buttons_layout)
 
         # Set the layout for the central widget
         
         central_widget.setLayout(self.main_layout)
 
+    # Dummy check grammar code for HTTP request
+    # Stores sentence everytime user clicks Check Grammar
+    def check_grammar(self):
+        sentence = self.input_text_edit.toPlainText()
+        self.store_sentence(sentence) 
 
     def init_suggestions_container(self):
         # Create the suggestions container
@@ -221,12 +220,15 @@ class GrammarCheckerApp(QMainWindow):
             self.suggestions_container.hide()
             self.no_errors_message()
             
+    # Method to display a message window when the input is error-free
     def no_errors_message(self):
         msg_box = QMessageBox()
         msg_box.setWindowTitle("No Errors Found")
         msg_box.setText("No grammar errors were found in the text.")
         msg_box.exec()
 
+    # Method to add a suggestion to the dynamic suggestion box
+    # Contains a Edit, Reject, and Report button
     def add_suggestions(self, suggestion_text):
         suggestion_box = QWidget()
         suggestions_layout = QHBoxLayout()
@@ -283,20 +285,25 @@ class GrammarCheckerApp(QMainWindow):
         suggestion_box.deleteLater()
         self.suggestions.remove(suggestion_box)
 
+        # Call to reject_suggestion method in backend
+        incorrect_sentence = self.get_incorrect_sentence() 
+        self.reject_suggestion(incorrect_sentence)
+
     def report_suggestion(self, suggestion_text):
         report_dialogue = ReportDialogue(suggestion_text)
         report_dialogue.exec()
     
-    def clear_suggestions(self):
-        # Clear any previous suggestions by removing widgets and clearing the list
+    # Method to clear suggestions when Clear All button is clicked
+    def clear_all_suggestions(self):
         for suggestion in self.suggestions:
             self.suggestions_container_layout.removeWidget(suggestion)
             suggestion.deleteLater()
         self.suggestions.clear()
 
+    # Method to clear text from input box
     def clear_text(self):
         self.input_text_edit.clear()
-        self.clear_suggestions()
+        self.clear_all_suggestions()
         self.suggestions_container.hide()
 
 class ReportDialogue(QDialog):
