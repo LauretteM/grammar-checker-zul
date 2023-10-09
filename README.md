@@ -22,7 +22,8 @@ This project was built using the following applications and extensions:
 1. Python
 2. PyQT6 for the Graphical User Interface (GUI)
 3. REST.API
-4. NLTK Toolkit
+4. Flask
+5. NLTK Toolkit
 
 <a name="GettingStarted"></a>
 ## Getting Started
