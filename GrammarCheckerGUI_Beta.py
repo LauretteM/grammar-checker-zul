@@ -1,6 +1,7 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QDialog, QGroupBox
-from PyQt6.QtGui import QFont, QColor, QTextCursor, QTextCharFormat, QPalette, QTextBlockFormat
+import requests
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QDialog, QGroupBox, QComboBox
+from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
 
 class GrammarCheckerApp(QMainWindow):
@@ -183,9 +184,9 @@ class GrammarCheckerApp(QMainWindow):
 
     # Dummy check grammar code for HTTP request
     # Stores sentence everytime user clicks Check Grammar
-    def check_grammar(self):
-        sentence = self.input_text_edit.toPlainText()
-        self.store_sentence(sentence) 
+    # def check_grammar(self):
+    #     sentence = self.input_text_edit.toPlainText()
+    #     self.store_sentence(sentence) 
 
     def init_suggestions_container(self):
         # Create the suggestions container
@@ -280,18 +281,23 @@ class GrammarCheckerApp(QMainWindow):
         self.suggestions_container_layout.addWidget(suggestion_box)
         self.suggestions.append(suggestion_box)
 
+    # def edit_button_clicked(self):
+    #     # Get the incorrect and corrected sentences from user input
+    #     incorrect_sentence = self.get_incorrect_sentence()  # Implement this method to get the incorrect sentence
+    #     corrected_sentence = self.get_corrected_sentence()  # Implement this method to get the corrected sentence
+    #     self.edit_sentence(incorrect_sentence, corrected_sentence)  # Call the method to edit the sentences
+
     def remove_suggestion(self, suggestion_box):
         self.suggestions_layout.removeWidget(suggestion_box)
         suggestion_box.deleteLater()
         self.suggestions.remove(suggestion_box)
 
-        # Call to reject_suggestion method in backend
-        incorrect_sentence = self.get_incorrect_sentence() 
-        self.reject_suggestion(incorrect_sentence)
+        # ## HTTP call to reject_suggestion method in backend
+        # # Extract the incorrect sentence from the suggestion_box or from wherever you have it
+        # incorrect_sentence = ...
 
-    def report_suggestion(self, suggestion_text):
-        report_dialogue = ReportDialogue(suggestion_text)
-        report_dialogue.exec()
+        # # Send a POST request to store the rejected suggestion
+        # response = requests.post('http://localhost:5000/api/reject-suggestion', json={'incorrect_sentence': incorrect_sentence})
     
     # Method to clear suggestions when Clear All button is clicked
     def clear_all_suggestions(self):
@@ -306,38 +312,58 @@ class GrammarCheckerApp(QMainWindow):
         self.clear_all_suggestions()
         self.suggestions_container.hide()
 
+    def report_suggestion(self, suggestion_text):
+        report_dialogue = ReportDialogue(suggestion_text)
+        report_dialogue.exec()
+
 class ReportDialogue(QDialog):
     def __init__(self, suggestion_text):
         super().__init__()
+
+        self.suggestion_text = suggestion_text
 
         # Create a dialog to report the suggestion (customize as needed)
         self.setWindowTitle("Report Suggestion")
         layout = QVBoxLayout()
         label = QLabel("Please select the error:")
         report_button = QPushButton("Report")
-        report_button.clicked.connect(self.accept)
+        report_button.clicked.connect(self.send_report)
+
+        self.reason_combo_box = QComboBox()
+        self.reason_combo_box.addItem("Incorrect Suggestion")
+        self.reason_combo_box.addItem("Unhelpful Suggestion")
+        self.reason_combo_box.addItem("Other Issue")
 
         layout.addWidget(label)
+        layout.addWidget(self.reason_combo_box)
         layout.addWidget(report_button)
         self.setLayout(layout)
 
+    def send_report(self):
+        # Get the selected reason and the suggestion text
+        selected_reason = self.reason_combo_box.currentText()
+        suggestion_text = self.suggestion_text
 
-    # def check_grammar(self):
-    #     # Get the text from the input area
-    #     input_text = self.input_text_edit.toPlainText()
+        # Send a POST request to store the report
+        response = requests.post('http://localhost:5000/api/store-report', json={'reason': selected_reason, 'sentence': suggestion_text})
 
-    #     # Perform grammar checking: We will have to work on this part
-    #     # For now we assume the grammar is correct
-    #     is_grammar_correct = True
+    def get_incorrect_sentence(self):
+        return self.input_text_edit.toPlainText()
 
-    #     if is_grammar_correct:
-    #         result_text = "Grammar is correct!"
-    #     else:
-    #         # In case of errors
-    #         result_text = "Grammar has errors. Suggestions: [Suggestions go here]"
+# def check_grammar(self):
+#         # Get the text from the input area
+#         input_text = self.input_text_edit.toPlainText()
 
-    #     # Display the result or suggestions in the output text area
-    #     self.output_text_edit.setPlainText(result_text)
+#         # Call the grammar checking function from the imported module
+#         error_messages = check_sentences(input_text)
+
+#         if error_messages:
+#             # If there are error messages, join them into a single string
+#             result_text = "\n".join(error_messages)
+#        
+#         else:
+#             # If there are no error messages, indicate that the grammar is correct
+#             result_text = "Grammar is correct!"
 
 
 

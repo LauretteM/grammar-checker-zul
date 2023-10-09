@@ -20,7 +20,7 @@ def store_sentence():
 @app.route('/api/reject-suggestion', methods=['POST'])
 def reject_suggestion():
     data = request.get_json()
-    incorrect_sentence = data.get('incorrect_sentence')
+    incorrect_sentence = data.get('incorrect_sentence') # Assuming we store the sentence as incorrect
     suggestions.append({'type': 'reject', 'sentence': incorrect_sentence})
     return jsonify({'message': 'Rejection stored successfully'})
 
