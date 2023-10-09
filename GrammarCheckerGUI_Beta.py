@@ -196,7 +196,7 @@ class GrammarCheckerApp(QMainWindow):
             """
             QGroupBox {
                 border: 1px solid #CCCCCC;
-                border-radius: 5px;
+                border-radius: 10px;
             }
             """
         )
@@ -205,7 +205,7 @@ class GrammarCheckerApp(QMainWindow):
 
     # Dummy suggestion code 
     def suggestion(self):
-        suggestions_text = ["Does your verb agree with your noun?"]
+        suggestions_text = ["Does your verb agree with your noun?", "Blah?", "Blah 2?"]
         #suggestions_text = []
         
         #self.clear_suggestions()
@@ -221,8 +221,6 @@ class GrammarCheckerApp(QMainWindow):
             self.suggestions_container.hide()
             self.no_errors_message()
             
-            # either show that there are no issues in the suggestions box OR add a pop up. Suggestions box might be cleaner at the end.
-
     def no_errors_message(self):
         msg_box = QMessageBox()
         msg_box.setWindowTitle("No Errors Found")
@@ -238,7 +236,7 @@ class GrammarCheckerApp(QMainWindow):
             QLabel {
                 color: #333333;
                 font-size: 14px;
-                margin: 5px
+                margin: 10px
             }
             """
         )
@@ -251,8 +249,8 @@ class GrammarCheckerApp(QMainWindow):
                 border: 1px inset #666666;
                 border-radius: 10px;
                 padding: 10px;
-                margin-left: 20px;
-                margin-right: 20px;
+                margin-left: 10px;
+                margin-right: 10px;
             }
 
             QPushButton:hover {
@@ -284,6 +282,10 @@ class GrammarCheckerApp(QMainWindow):
         self.suggestions_layout.removeWidget(suggestion_box)
         suggestion_box.deleteLater()
         self.suggestions.remove(suggestion_box)
+
+    def report_suggestion(self, suggestion_text):
+        report_dialogue = ReportDialogue(suggestion_text)
+        report_dialogue.exec()
     
     def clear_suggestions(self):
         # Clear any previous suggestions by removing widgets and clearing the list
@@ -291,10 +293,6 @@ class GrammarCheckerApp(QMainWindow):
             self.suggestions_container_layout.removeWidget(suggestion)
             suggestion.deleteLater()
         self.suggestions.clear()
-
-    def report_suggestion(self, suggestion_text):
-        report_dialogue = ReportDialogue(suggestion_text)
-        report_dialogue.exec()
 
     def clear_text(self):
         self.input_text_edit.clear()
@@ -334,29 +332,6 @@ class ReportDialogue(QDialog):
     #     # Display the result or suggestions in the output text area
     #     self.output_text_edit.setPlainText(result_text)
 
-
-    """
-    Dummy code for grammar check and underline features
-    """
-    # def grammar_check(self):
-    #     user_input = self.input_text_edit.toPlainText()
-    #     words = user_input.split()
-
-    #     for word in words:
-    #         if not self.word_correct(word):
-    #             self.incorrect_underline(word)
-
-    # def word_correct(self, word):
-    #     return False
-    
-    # def incorrect_underline(self, word):
-    #     cursor = self.input_text_edit.textCursor()
-    #     format = QTextCharFormat()
-    #     format.setUnderlineColor(QColor("red"))  # Set the underline color to red
-    #     format.setUnderlineStyle(QTextCharFormat.UnderlineStyle.DashUnderline)  # Set the underline style
-    #     cursor.setPosition(self.input_text_edit.toPlainText().index(word))
-    #     cursor.setPosition(cursor.position() + len(word), QTextCursor.MoveMode.KeepAnchor)
-    #     cursor.mergeCharFormat(format)
 
 
 def main():
