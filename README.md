@@ -16,6 +16,13 @@
 ## Usage 
 This project aims to address the following research question: Can a formal grammar be used to develop a grammar checker to identify agreement errors in IsiZulu?
 
+### Installation requirements
+This project uses a number of libraries that can be installed via `pip`.
+
+    pip install PyQt6 nltk pgf pgfaux
+
+Todo: add all 
+
 <a name="BuiltWith"></a>
 ## Built With
 This project was built using the following applications and extensions:
