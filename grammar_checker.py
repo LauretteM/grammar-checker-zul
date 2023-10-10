@@ -7,6 +7,8 @@ from time import time
 g = pgf.readPGF('ZMLargeExtChunk.pgf')
 zul = g.languages['ZMLargeExtChunkZul']
 
+MAX_TRIES = 3
+
 QUAL_VPS = [
     ('CopAP',gr.QUAL_ADJ_AGREEMENT),
     ('CopNP',gr.QUAL_ID_NP_AGREEMENT),
@@ -60,15 +62,21 @@ def _pred_check(np_pred_pair: tuple,fun: str,result: 'list[gr]'):
 def check_sentence(sentence: str):
 
     start_time = time()
-    parses = get_first_parses(sentence,1)
-    for p in parses:
+    i = zul.parse(sentence)
+    tries = 0
+    while tries < MAX_TRIES:
+        tries += 1
+        try:
+            prob,p = next(i)
+        except:
+            break
+
         if an.root_str(p) == 'PhrUtt': # sentence parsed as single unit
-            return (gr.CORRECT,sentence,'')
+                return (gr.CORRECT,sentence,'')
 
-    parsed_time = time()
-    print('parsed: ',parsed_time - start_time)
+        parsed_time = time()
+        print('parsed: ',parsed_time - start_time)
 
-    for p in parses:
         cs = an.subtrees_of_cat(p,'Chunk',g,False)
         cs_str = [str(c) for c in cs]
         print(cs_str)
