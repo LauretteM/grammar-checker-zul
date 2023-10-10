@@ -1,6 +1,6 @@
 import sys
 import requests
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QDialog, QGroupBox, QComboBox
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QDialog, QGroupBox, QComboBox, QSizePolicy, QSpacerItem
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
 
@@ -153,7 +153,7 @@ class GrammarCheckerApp(QMainWindow):
             }
 
             QPushButton:hover {
-                background-color: #666666;
+                background-color: #BBBBBB;
             }
             """
         )
@@ -239,11 +239,15 @@ class GrammarCheckerApp(QMainWindow):
             QLabel {
                 color: #333333;
                 font-size: 14px;
-                margin: 10px
+                margin: 10px;
             }
             """
         )
-        
+
+    # Create a container for the buttons
+        button_container = QWidget()
+        button_container.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+
         # Button formatting
         suggestion_button = """
             QPushButton {
@@ -257,12 +261,17 @@ class GrammarCheckerApp(QMainWindow):
             }
 
             QPushButton:hover {
-                background-color: #666666;
+                background-color: #EEEEEE;
             }
             """
         
         button_font = QFont("Helvetica Neue", 10)           
 
+        edit_button = QPushButton("Edit")
+        edit_button.setFont(button_font)
+        edit_button.setStyleSheet(suggestion_button)
+        edit_button.clicked.connect(lambda: None)
+        
         reject_button = QPushButton("Reject")
         reject_button.setFont(button_font)
         reject_button.setStyleSheet(suggestion_button)
@@ -273,13 +282,21 @@ class GrammarCheckerApp(QMainWindow):
         report_button.setStyleSheet(suggestion_button)
         report_button.clicked.connect(lambda: self.report_suggestion(suggestion_text))
 
+        # Add buttons to the button container
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(edit_button)
+        button_layout.addWidget(reject_button)
+        button_layout.addWidget(report_button)
+        button_container.setLayout(button_layout)
+        
         suggestions_layout.addWidget(suggestion_label)
-        suggestions_layout.addWidget(reject_button)
-        suggestions_layout.addWidget(report_button)
+        suggestions_layout.addWidget(button_container)
+        # suggestions_layout.addWidget(edit_button)
+        # suggestions_layout.addWidget(reject_button)
+        # suggestions_layout.addWidget(report_button)
         suggestion_box.setLayout(suggestions_layout)
 
         self.suggestions_container_layout.addWidget(suggestion_box)
-        self.suggestions.append(suggestion_box)
 
     # def edit_button_clicked(self):
     #     # Get the incorrect and corrected sentences from user input
@@ -322,7 +339,7 @@ class ReportDialogue(QDialog):
 
         self.suggestion_text = suggestion_text
 
-        # Create a dialog to report the suggestion (customize as needed)
+        # Create a dialog to report the suggestion
         self.setWindowTitle("Report Suggestion")
         layout = QVBoxLayout()
         label = QLabel("Please select the error:")
@@ -347,8 +364,8 @@ class ReportDialogue(QDialog):
         # Send a POST request to store the report
         response = requests.post('http://localhost:5000/api/store-report', json={'reason': selected_reason, 'sentence': suggestion_text})
 
-    def get_incorrect_sentence(self):
-        return self.input_text_edit.toPlainText()
+    # def get_incorrect_sentence(self):
+    #     return self.input_text_edit.toPlainText()
 
 # def check_grammar(self):
 #         # Get the text from the input area
