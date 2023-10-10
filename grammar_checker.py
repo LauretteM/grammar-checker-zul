@@ -63,7 +63,7 @@ def check_sentence(sentence: str):
     parses = get_first_parses(sentence,1)
     for p in parses:
         if an.root_str(p) == 'PhrUtt': # sentence parsed as single unit
-            return (gr.CORRECT,sentence,p)
+            return (gr.CORRECT,sentence,'')
 
     parsed_time = time()
     print('parsed: ',parsed_time - start_time)
@@ -122,4 +122,4 @@ def check_sentence(sentence: str):
                     print('replaced: ',replacement_found_time - error_found_time)
                     return result,bad_lin,good_lin
         
-    return gr.NO_ERRORS_FOUND
+    return (gr.NO_ERRORS_FOUND,sentence,'')
