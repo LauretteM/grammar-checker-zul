@@ -10,7 +10,7 @@ class GrammarCheckerApp(QMainWindow):
 
         # Set window title and dimensions
         self.setWindowTitle("isiZulu Grammar Checker")
-        window_width = 600
+        window_width = 1200
         window_height = 550
 
         # Calculate center of user's screen
@@ -266,27 +266,16 @@ class GrammarCheckerApp(QMainWindow):
             """
         
         button_font = QFont("Helvetica Neue", 10)           
-
-        edit_button = QPushButton("Edit")
-        edit_button.setFont(button_font)
-        edit_button.setStyleSheet(suggestion_button)
-        edit_button.clicked.connect(lambda: None)
         
         reject_button = QPushButton("Reject")
         reject_button.setFont(button_font)
         reject_button.setStyleSheet(suggestion_button)
         reject_button.clicked.connect(lambda: self.remove_suggestion(suggestion_box))
     
-        report_button = QPushButton("Report")
-        report_button.setFont(button_font)
-        report_button.setStyleSheet(suggestion_button)
-        report_button.clicked.connect(lambda: self.report_suggestion(suggestion_text))
 
         # Add buttons to the button container
         button_layout = QHBoxLayout()
-        button_layout.addWidget(edit_button)
         button_layout.addWidget(reject_button)
-        button_layout.addWidget(report_button)
         button_container.setLayout(button_layout)
         
         suggestions_layout.addWidget(suggestion_label)
@@ -298,23 +287,10 @@ class GrammarCheckerApp(QMainWindow):
 
         self.suggestions_container_layout.addWidget(suggestion_box)
 
-    # def edit_button_clicked(self):
-    #     # Get the incorrect and corrected sentences from user input
-    #     incorrect_sentence = self.get_incorrect_sentence()  # Implement this method to get the incorrect sentence
-    #     corrected_sentence = self.get_corrected_sentence()  # Implement this method to get the corrected sentence
-    #     self.edit_sentence(incorrect_sentence, corrected_sentence)  # Call the method to edit the sentences
-
     def remove_suggestion(self, suggestion_box):
         self.suggestions_layout.removeWidget(suggestion_box)
         suggestion_box.deleteLater()
         self.suggestions.remove(suggestion_box)
-
-        # ## HTTP call to reject_suggestion method in backend
-        # # Extract the incorrect sentence from the suggestion_box or from wherever you have it
-        # incorrect_sentence = ...
-
-        # # Send a POST request to store the rejected suggestion
-        # response = requests.post('http://localhost:5000/api/reject-suggestion', json={'incorrect_sentence': incorrect_sentence})
     
     # Method to clear suggestions when Clear All button is clicked
     def clear_all_suggestions(self):
@@ -329,43 +305,8 @@ class GrammarCheckerApp(QMainWindow):
         self.clear_all_suggestions()
         self.suggestions_container.hide()
 
-    def report_suggestion(self, suggestion_text):
-        report_dialogue = ReportDialogue(suggestion_text)
-        report_dialogue.exec()
-
-class ReportDialogue(QDialog):
-    def __init__(self, suggestion_text):
-        super().__init__()
-
-        self.suggestion_text = suggestion_text
-
-        # Create a dialog to report the suggestion
-        self.setWindowTitle("Report Suggestion")
-        layout = QVBoxLayout()
-        label = QLabel("Please select the error:")
-        report_button = QPushButton("Report")
-        report_button.clicked.connect(self.send_report)
-
-        self.reason_combo_box = QComboBox()
-        self.reason_combo_box.addItem("Incorrect Suggestion")
-        self.reason_combo_box.addItem("Unhelpful Suggestion")
-        self.reason_combo_box.addItem("Other Issue")
-
-        layout.addWidget(label)
-        layout.addWidget(self.reason_combo_box)
-        layout.addWidget(report_button)
-        self.setLayout(layout)
-
-    def send_report(self):
-        # Get the selected reason and the suggestion text
-        selected_reason = self.reason_combo_box.currentText()
-        suggestion_text = self.suggestion_text
-
-        # Send a POST request to store the report
-        response = requests.post('http://localhost:5000/api/store-report', json={'reason': selected_reason, 'sentence': suggestion_text})
-
-    # def get_incorrect_sentence(self):
-    #     return self.input_text_edit.toPlainText()
+    def get_incorrect_sentence(self):
+        return self.input_text_edit.toPlainText()
 
 # def check_grammar(self):
 #         # Get the text from the input area
