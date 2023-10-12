@@ -1,5 +1,6 @@
 import sys
-import requests
+import nltk
+from grammar_checker import check_sentence
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QDialog, QGroupBox, QComboBox, QSizePolicy, QSpacerItem
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
@@ -182,12 +183,6 @@ class GrammarCheckerApp(QMainWindow):
         
         central_widget.setLayout(self.main_layout)
 
-    # Dummy check grammar code for HTTP request
-    # Stores sentence everytime user clicks Check Grammar
-    # def check_grammar(self):
-    #     sentence = self.input_text_edit.toPlainText()
-    #     self.store_sentence(sentence) 
-
     def init_suggestions_container(self):
         # Create the suggestions container
         self.suggestions_container = QGroupBox("Suggestions")
@@ -203,12 +198,24 @@ class GrammarCheckerApp(QMainWindow):
         self.suggestions_container.setLayout(self.suggestions_container_layout)
         self.suggestions_container.hide()
 
+    def grammar_checker(self):
+        # needs to go through each sentence individually. Maybe we can seperate using a fullstop
+        sentences = self.input_text_edit.toPlainText()
+        # Dummy tokenizer code
+        sentences = nltk.sent_tokenize(sentences)
+
+        for sentence in sentences:
+            result, bad_sentence, good_sentence = check_sentence(sentence) 
+
+            if result == "Could not identify agreement errors.":
+                self.no_errors_message()
+            else:
+                self.add_suggestions(result)
+
     # Dummy suggestion code 
     def suggestion(self):
         suggestions_text = ["Does your verb agree with your noun?", "Blah?", "Blah 2?"]
         #suggestions_text = []
-        
-        #self.clear_suggestions()
 
         if suggestions_text:
         # There are suggestions, clear any previous content and show the container
