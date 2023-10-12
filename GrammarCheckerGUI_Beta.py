@@ -134,7 +134,7 @@ class GrammarCheckerApp(QMainWindow):
         Add a clear all button
         """
        
-        self.clearAll_button = QPushButton("Clear text", self)
+        self.clearAll_button = QPushButton("Clear All", self)
     
         # Set the font for the button
         button_font = QFont("Helvetica Neue", 16)
@@ -231,18 +231,32 @@ class GrammarCheckerApp(QMainWindow):
     # Method to add a suggestion to the dynamic suggestion box
     # Contains a Edit, Reject, and Report button
     def add_suggestions(self, suggestion_text):
-        suggestion_box = QWidget()
-        suggestions_layout = QHBoxLayout()
-        suggestion_label = QLabel(suggestion_text)
-        suggestion_label.setStyleSheet(
-            """
+        suggestion_style = """
             QLabel {
                 color: #333333;
                 font-size: 14px;
                 margin: 10px;
+                border-bottom: 1px solid #666666;  /* Add a separation border for all suggestions */
+            }
+            QLabel:last-child {
+                border-bottom: none;  /* Remove the border for the last suggestion */
+            }
+            """
+        suggestion_box = QWidget()
+        suggestions_layout = QHBoxLayout()
+
+        # Create a container for the buttons and styling
+        suggestion_with_buttons = QWidget()
+        suggestion_with_buttons.setStyleSheet(
+            """
+            QWidget {
+                border-bottom: 1px solid #666666;  /* Add a separation border for all suggestions */
             }
             """
         )
+
+        suggestion_label = QLabel(suggestion_text)
+        suggestion_label.setStyleSheet(suggestion_style)
 
     # Create a container for the buttons
         button_container = QWidget()
@@ -265,16 +279,21 @@ class GrammarCheckerApp(QMainWindow):
             }
             """
         
-        button_font = QFont("Helvetica Neue", 10)           
+        button_font = QFont("Helvetica Neue", 10) 
+
+        accept_button = QPushButton("Accept")
+        accept_button.setFont(button_font)
+        accept_button.setStyleSheet(suggestion_button)
+        accept_button.clicked.connect(lambda: None)          
         
         reject_button = QPushButton("Reject")
         reject_button.setFont(button_font)
         reject_button.setStyleSheet(suggestion_button)
         reject_button.clicked.connect(lambda: self.remove_suggestion(suggestion_box))
     
-
         # Add buttons to the button container
         button_layout = QHBoxLayout()
+        button_layout.addWidget(accept_button)
         button_layout.addWidget(reject_button)
         button_container.setLayout(button_layout)
         
@@ -304,9 +323,6 @@ class GrammarCheckerApp(QMainWindow):
         self.input_text_edit.clear()
         self.clear_all_suggestions()
         self.suggestions_container.hide()
-
-    def get_incorrect_sentence(self):
-        return self.input_text_edit.toPlainText()
 
 # def check_grammar(self):
 #         # Get the text from the input area
