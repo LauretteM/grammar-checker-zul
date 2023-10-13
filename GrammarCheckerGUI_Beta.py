@@ -189,6 +189,18 @@ class GrammarCheckerApp(QMainWindow):
         
         # Add the input container and suggestions container to the main layout side by side
         horizontal_container = QHBoxLayout()
+            #         """
+            # QGroupBox {
+            #     border: 1px solid #CCCCCC;
+            #     border-radius: 10px;
+            #     padding: 5px;
+            #     margin-left: 0px;
+            #     margin-right: 100px;
+            #     margin-bottom: 20px;
+            #     margin-top: 0px;
+
+            # }
+            # """
         horizontal_container.addWidget(input_container)
         horizontal_container.addWidget(self.suggestions_container)
 
@@ -248,11 +260,13 @@ class GrammarCheckerApp(QMainWindow):
 
         suggestions_text = ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
         #suggestions_text = []
+        incorrect_phrase = "Test 1"
+        correct_phrase = "Test 2"
 
         if suggestions_text:
         # There are suggestions, clear any previous content and show the container
             for suggestion_text in suggestions_text:
-                self.add_suggestions(suggestion_text)
+                self.add_suggestions(suggestion_text, incorrect_phrase, correct_phrase)
                     # Show the container after adding suggestions
             self.suggestions_container.show()
 
@@ -268,8 +282,8 @@ class GrammarCheckerApp(QMainWindow):
         msg_box.exec()
 
     # Method to add a suggestion to the dynamic suggestion box
-    # Contains a Edit, Reject, and Report button
-    def add_suggestions(self, suggestion_text):
+    # Contains a Edit and Reject buttons
+    def add_suggestions(self, suggestion_text, incorrect_phrase, correct_phrase):
         suggestion_style = """
             QLabel {
                 color: #333333;
@@ -280,16 +294,29 @@ class GrammarCheckerApp(QMainWindow):
        
         suggestions_layout = QHBoxLayout()
 
-        # Create a separator line (border) under the suggestion
-        line = QFrame()
-        line.setFrameShape(QFrame.Shape.HLine)
-        line.setFrameShadow(QFrame.Shadow.Sunken)
-        line.setStyleSheet("background-color: #666666;")
+        # # Create a separator line (border) under the suggestion
+        # WIP
+        # line = QFrame()
+        # line.setFrameShape(QFrame.Shape.HLine)
+        # line.setFrameShadow(QFrame.Shadow.Sunken)
+        # line.setStyleSheet("background-color: #666666;")
 
         suggestion_label = QLabel(suggestion_text)
         suggestion_label.setStyleSheet(suggestion_style)
 
-    # Create a container for the buttons
+        # Create labels for the incorrect and corrected parts
+        parts_label = QLabel(f"{incorrect_phrase} --> {correct_phrase}")
+        label_font = QFont("Helvetica Neue", 5)
+        parts_label.setFont(label_font)
+        parts_label.setStyleSheet("""
+            QLabel {
+                color: #333333;
+                font-size: 10px;
+                margin: 1px;
+            }
+            """)
+
+        # Create a container for the buttons
         button_container = QWidget()
         button_container.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
@@ -332,10 +359,8 @@ class GrammarCheckerApp(QMainWindow):
         button_container.setLayout(button_layout)
         
         suggestions_layout.addWidget(suggestion_label)
+        suggestions_layout.addWidget(parts_label)
         suggestions_layout.addWidget(button_container)
-        # suggestions_layout.addWidget(edit_button)
-        # suggestions_layout.addWidget(reject_button)
-        # suggestions_layout.addWidget(report_button)
         self.suggestions_layout.addWidget(suggestion_box)
 
         # Add suggestions to layout
