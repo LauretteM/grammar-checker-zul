@@ -1,7 +1,7 @@
 import sys
 import nltk
-from grammar_checker import check_sentence
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QDialog, QGroupBox, QComboBox, QSizePolicy, QSpacerItem
+# from grammar_checker import check_sentence
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QGroupBox, QSizePolicy, QFrame
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
 
@@ -63,10 +63,21 @@ class GrammarCheckerApp(QMainWindow):
         # Create a container for input-related items
         input_container = QGroupBox()
         input_container_layout = QVBoxLayout()
-
         input_container = QWidget(self)
-        # Create a layout for the input text area and button
+        input_container.setStyleSheet(
+            """
+            QGroupBox {
+                border: 1px solid #CCCCCC;
+                border-radius: 10px;
+                padding: 1px;
+                margin-left: 0px;
+                margin-right: 0px;
 
+            }
+            """
+        )
+
+        # Create a layout for the input text area and button
         input_layout = QHBoxLayout()
 
         # Create a text input area (QTextEdit) for input text
@@ -123,6 +134,10 @@ class GrammarCheckerApp(QMainWindow):
                 padding: 10px;
                 margin-left: 300px;
                 margin-right: 300px;
+                margin-bottom: 2px;
+                margin-top: 10px;
+
+                
             }
             QPushButton:hover {
                 background-color: #666666;
@@ -151,6 +166,9 @@ class GrammarCheckerApp(QMainWindow):
                 padding: 10px;
                 margin-left: 300px;
                 margin-right: 300px;
+                margin-bottom: 20px;
+                margin-top: 0px;
+
             }
 
             QPushButton:hover {
@@ -185,36 +203,50 @@ class GrammarCheckerApp(QMainWindow):
 
     def init_suggestions_container(self):
         # Create the suggestions container
-        self.suggestions_container = QGroupBox("Suggestions")
+        self.suggestions_container = QGroupBox()
         self.suggestions_container_layout = QVBoxLayout()
+        self.suggestions_container.setFixedWidth(500)  # Set a fixed width
+        self.suggestions_container.setFixedHeight(400)  # Set a fixed height
         self.suggestions_container.setStyleSheet(
             """
             QGroupBox {
                 border: 1px solid #CCCCCC;
                 border-radius: 10px;
+                padding: 5px;
+                margin-left: 0px;
+                margin-right: 100px;
+                margin-bottom: 20px;
+                margin-top: 0px;
+
             }
             """
         )
         self.suggestions_container.setLayout(self.suggestions_container_layout)
         self.suggestions_container.hide()
 
-    def grammar_checker(self):
-        # needs to go through each sentence individually. Maybe we can seperate using a fullstop
-        sentences = self.input_text_edit.toPlainText()
-        # Dummy tokenizer code
-        sentences = nltk.sent_tokenize(sentences)
+    # def grammar_checker(self):
+    #     # Dummy tokenizer code
+    #     # needs to go through each sentence individually. Maybe we can seperate using a fullstop
+    #     sentences = nltk.sent_tokenizeself(self.input_text_edit.toPlainText())
+        
+    #     for sentence in sentences:
+    #         result, bad_sentence, good_sentence = check_sentence(sentence) 
 
-        for sentence in sentences:
-            result, bad_sentence, good_sentence = check_sentence(sentence) 
+    #         if result == gr.CORRECT or result == gr.NO_ERRORS_FOUND:
+    #             pass
+    #         else:
+    #             self.add_suggestions(result)
 
-            if result == "Could not identify agreement errors.":
-                self.no_errors_message()
-            else:
-                self.add_suggestions(result)
+    #         # if on third sentence, and there's still no error (meaning we've gone through every sentence, call # self.no_errors_message() to show noerrors popup
 
     # Dummy suggestion code 
     def suggestion(self):
-        suggestions_text = ["Does your verb agree with your noun?", "Blah?", "Blah 2?"]
+        
+        # Disable "Check Grammar" button and set input box to ReadOnly while returning suggestions
+        self.check_button.setEnabled(False)
+        self.input_text_edit.setReadOnly(True)
+
+        suggestions_text = ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
         #suggestions_text = []
 
         if suggestions_text:
@@ -242,25 +274,17 @@ class GrammarCheckerApp(QMainWindow):
             QLabel {
                 color: #333333;
                 font-size: 14px;
-                margin: 10px;
-                border-bottom: 1px solid #666666;  /* Add a separation border for all suggestions */
-            }
-            QLabel:last-child {
-                border-bottom: none;  /* Remove the border for the last suggestion */
+                margin: 1px;
             }
             """
-        suggestion_box = QWidget()
+       
         suggestions_layout = QHBoxLayout()
 
-        # Create a container for the buttons and styling
-        suggestion_with_buttons = QWidget()
-        suggestion_with_buttons.setStyleSheet(
-            """
-            QWidget {
-                border-bottom: 1px solid #666666;  /* Add a separation border for all suggestions */
-            }
-            """
-        )
+        # Create a separator line (border) under the suggestion
+        line = QFrame()
+        line.setFrameShape(QFrame.Shape.HLine)
+        line.setFrameShadow(QFrame.Shadow.Sunken)
+        line.setStyleSheet("background-color: #666666;")
 
         suggestion_label = QLabel(suggestion_text)
         suggestion_label.setStyleSheet(suggestion_style)
@@ -285,7 +309,10 @@ class GrammarCheckerApp(QMainWindow):
                 background-color: #EEEEEE;
             }
             """
-        
+        # A suggestion box for each single suggestion
+        suggestion_box = QWidget()
+
+        # Accept and reject buttons
         button_font = QFont("Helvetica Neue", 10) 
 
         accept_button = QPushButton("Accept")
@@ -309,8 +336,13 @@ class GrammarCheckerApp(QMainWindow):
         # suggestions_layout.addWidget(edit_button)
         # suggestions_layout.addWidget(reject_button)
         # suggestions_layout.addWidget(report_button)
+        self.suggestions_layout.addWidget(suggestion_box)
+
+        # Add suggestions to layout
         suggestion_box.setLayout(suggestions_layout)
 
+        # Add the suggestions to the suggestions box
+        self.suggestions.append(suggestion_box)
         self.suggestions_container_layout.addWidget(suggestion_box)
 
     def remove_suggestion(self, suggestion_box):
@@ -324,29 +356,16 @@ class GrammarCheckerApp(QMainWindow):
             self.suggestions_container_layout.removeWidget(suggestion)
             suggestion.deleteLater()
         self.suggestions.clear()
-
+        
+        # Enable "Check Grammar" button and disable input box to ReadOnly when user clears suggestions
+        self.check_button.setEnabled(True)
+        self.input_text_edit.setReadOnly(False)
+       
     # Method to clear text from input box
     def clear_text(self):
         self.input_text_edit.clear()
         self.clear_all_suggestions()
         self.suggestions_container.hide()
-
-# def check_grammar(self):
-#         # Get the text from the input area
-#         input_text = self.input_text_edit.toPlainText()
-
-#         # Call the grammar checking function from the imported module
-#         error_messages = check_sentences(input_text)
-
-#         if error_messages:
-#             # If there are error messages, join them into a single string
-#             result_text = "\n".join(error_messages)
-#        
-#         else:
-#             # If there are no error messages, indicate that the grammar is correct
-#             result_text = "Grammar is correct!"
-
-
 
 def main():
     app = QApplication(sys.argv)
