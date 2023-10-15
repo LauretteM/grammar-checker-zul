@@ -11,7 +11,7 @@ class GrammarCheckerApp(QMainWindow):
 
         # Set window title and dimensions
         self.setWindowTitle("isiZulu Grammar Checker")
-        window_width = 1200
+        window_width = 1400
         window_height = 550
 
         # Calculate center of user's screen
@@ -43,6 +43,8 @@ class GrammarCheckerApp(QMainWindow):
         title_label.setStyleSheet("""
             background-color: #FFFFFF;
             color: black;
+            margin-top: 20px;
+            margin-bottom: 7px;
         """)
 
         # Create app description
@@ -64,18 +66,6 @@ class GrammarCheckerApp(QMainWindow):
         input_container = QGroupBox()
         input_container_layout = QVBoxLayout()
         input_container = QWidget(self)
-        input_container.setStyleSheet(
-            """
-            QGroupBox {
-                border: 1px solid #CCCCCC;
-                border-radius: 10px;
-                padding: 1px;
-                margin-left: 0px;
-                margin-right: 0px;
-
-            }
-            """
-        )
 
         # Create a layout for the input text area and button
         input_layout = QHBoxLayout()
@@ -90,17 +80,23 @@ class GrammarCheckerApp(QMainWindow):
             """
             color: black;
             background-color: white;
-            border: 0.5px solid #808080;
+            border: 0.5px solid #CCCCCC;
             border-radius: 10px; /* Create rounded corners
             font-size: 16px;
+            margin-left: 30px;
+            margin-right: 30px;
+            margin-bottom: 2px;
+            margin-top: 10px;
             """
         )
-        input_area_shadow = QGraphicsDropShadowEffect(self)
-        input_area_shadow.setColor(QColor(128, 128, 128, 200))
-        input_area_shadow.setBlurRadius(20)
-        input_area_shadow.setXOffset(7)
-        input_area_shadow.setYOffset(7)
-        self.input_text_edit.setGraphicsEffect(input_area_shadow)
+
+        # Roné, if you see this, please check how you think this looks with and without the shading by uncommenting the code below :) I'm torn. Lmk what you think
+        # input_area_shadow = QGraphicsDropShadowEffect(self)
+        # input_area_shadow.setColor(QColor(128, 128, 128, 128))
+        # input_area_shadow.setBlurRadius(40)
+        # input_area_shadow.setXOffset(7)
+        # input_area_shadow.setYOffset(7)
+        # self.input_text_edit.setGraphicsEffect(input_area_shadow)
 
         input_layout.addWidget(self.input_text_edit, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -108,7 +104,7 @@ class GrammarCheckerApp(QMainWindow):
         Create a dynamic "Suggestions section.
         """
 
-        self.suggestions_layout = QVBoxLayout()
+        self.suggestions_layout = QHBoxLayout()
         self.suggestions = []
 
         """
@@ -134,10 +130,8 @@ class GrammarCheckerApp(QMainWindow):
                 padding: 10px;
                 margin-left: 300px;
                 margin-right: 300px;
-                margin-bottom: 2px;
-                margin-top: 10px;
-
-                
+                margin-bottom: 0x;
+                margin-top: 5px;
             }
             QPushButton:hover {
                 background-color: #666666;
@@ -189,18 +183,6 @@ class GrammarCheckerApp(QMainWindow):
         
         # Add the input container and suggestions container to the main layout side by side
         horizontal_container = QHBoxLayout()
-            #         """
-            # QGroupBox {
-            #     border: 1px solid #CCCCCC;
-            #     border-radius: 10px;
-            #     padding: 5px;
-            #     margin-left: 0px;
-            #     margin-right: 100px;
-            #     margin-bottom: 20px;
-            #     margin-top: 0px;
-
-            # }
-            # """
         horizontal_container.addWidget(input_container)
         horizontal_container.addWidget(self.suggestions_container)
 
@@ -217,18 +199,19 @@ class GrammarCheckerApp(QMainWindow):
         # Create the suggestions container
         self.suggestions_container = QGroupBox()
         self.suggestions_container_layout = QVBoxLayout()
-        self.suggestions_container.setFixedWidth(500)  # Set a fixed width
-        self.suggestions_container.setFixedHeight(400)  # Set a fixed height
+        self.suggestions_container.setFixedWidth(600)  # Set a fixed width
+        self.suggestions_container.setFixedHeight(450)  # Set a fixed height
         self.suggestions_container.setStyleSheet(
             """
             QGroupBox {
+                background-color: white;
                 border: 1px solid #CCCCCC;
                 border-radius: 10px;
-                padding: 5px;
-                margin-left: 0px;
+                padding: 0px;
+                margin-left: 10px;
                 margin-right: 100px;
                 margin-bottom: 20px;
-                margin-top: 0px;
+                margin-top: 5px;
 
             }
             """
@@ -288,7 +271,7 @@ class GrammarCheckerApp(QMainWindow):
             QLabel {
                 color: #333333;
                 font-size: 14px;
-                margin: 1px;
+                margin: 10px;
             }
             """
        
@@ -311,8 +294,8 @@ class GrammarCheckerApp(QMainWindow):
         parts_label.setStyleSheet("""
             QLabel {
                 color: #333333;
-                font-size: 10px;
-                margin: 1px;
+                font-size: 11px;
+                margin: 10px;
             }
             """)
 
@@ -327,8 +310,8 @@ class GrammarCheckerApp(QMainWindow):
                 color: black;
                 border: 1px inset #666666;
                 border-radius: 10px;
-                padding: 10px;
-                margin-left: 10px;
+                padding: 10px 10px;
+                margin-left: 2px;
                 margin-right: 10px;
             }
 
@@ -353,7 +336,7 @@ class GrammarCheckerApp(QMainWindow):
         reject_button.clicked.connect(lambda: self.remove_suggestion(suggestion_box))
     
         # Add buttons to the button container
-        button_layout = QHBoxLayout()
+        button_layout = QVBoxLayout()
         button_layout.addWidget(accept_button)
         button_layout.addWidget(reject_button)
         button_container.setLayout(button_layout)
