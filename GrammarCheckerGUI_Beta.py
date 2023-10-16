@@ -1,9 +1,28 @@
 import sys
 import nltk
+import nltk
 # from grammar_checker import check_sentence
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QGroupBox, QSizePolicy, QFrame
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
+from nltk.tokenize import sent_tokenize, word_tokenize
+
+Download NLTK data
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+def tokenize_and_tag(input_text):
+    # Tokenize the input text into sentences
+    sentences = sent_tokenize(input_text)
+    
+    # Tokenize each sentence into words and perform part-of-speech tagging
+    tokenized_and_tagged_text = []
+    for sentence in sentences:
+        words = word_tokenize(sentence)
+        pos_tags = nltk.pos_tag(words) # perform part-of-speech tagging
+        tokenized_and_tagged_text.append(pos_tags)
+    
+    return tokenized_and_tagged_text
 
 class GrammarCheckerApp(QMainWindow):
     def __init__(self):
