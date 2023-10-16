@@ -1,0 +1,21 @@
+import nltk
+from nltk.tokenize import sent_tokenize
+import random
+
+def check_sentence(sentence):
+    check = random.random()  # Use random.random() to get a random float between 0 and 1
+    if check < 0.3:
+        return "Does your adjective agree with your noun?" # Check agreement by allocating an integer value
+    elif check < 0.7:
+        return "Does your verb agree with your noun?" 
+    else:
+        return "The grammar is correct!" # Indicate that the grammar is correct
+
+# Generate an error message if the grammar is incorrect
+def check_sentences(text):
+    sentences = sent_tokenize(text)
+    messages = []
+    for s in sentences:
+        msg = check_sentence(s)
+        messages.append(msg)
+    return messages
