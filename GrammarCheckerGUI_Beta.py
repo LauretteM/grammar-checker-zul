@@ -1,18 +1,24 @@
 import sys
 import nltk
-import nltk
-# from grammar_checker import check_sentence
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QGroupBox, QSizePolicy, QFrame
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
 from nltk.tokenize import sent_tokenize, word_tokenize
+from enum import Enum
 
-Download NLTK data
+# Download NLTK data
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
+# Error checking the downloads
+try:
+    nltk.download('punkt')
+    nltk.download('averaged_perceptron_tagger')
+except Exception as e:
+    print("Error occurred during NLTK data download:", e)
+    
+# tokenize the input text into sentences
 def tokenize_and_tag(input_text):
-    # Tokenize the input text into sentences
     sentences = sent_tokenize(input_text)
     
     # Tokenize each sentence into words and perform part-of-speech tagging
@@ -23,6 +29,22 @@ def tokenize_and_tag(input_text):
         tokenized_and_tagged_text.append(pos_tags)
     
     return tokenized_and_tagged_text
+
+class GrammarResult(Enum):
+    CORRECT = "This sentence looks good."
+    NO_ERRORS_FOUND = "Could not identify agreement errors."
+
+    QUAL_ADJ_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying adjective."
+    QUAL_ID_NP_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying noun."
+    QUAL_ASSOC_NP_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying associative noun."
+    QUAL_LOC_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying locative expression."
+    QUAL_VERB_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying verb phrase."
+    
+    SUBJ_ADJ_AGREEMENT = "Check the agreement between the noun/pronoun and the predicative adjective."
+    SUBJ_ID_NP_AGREEMENT = "Check the agreement between the noun/pronoun and the predicate noun."
+    SUBJ_ASSOC_NP_AGREEMENT = "Check the agreement between the noun/pronoun and the associative noun."
+    SUBJ_LOC_AGREEMENT = "Check the agreement between the noun/pronoun and the locative predicate."
+    SUBJ_VERB_AGREEMENT = "Check the agreement between the subject and verb."
 
 class GrammarCheckerApp(QMainWindow):
     def __init__(self):
@@ -69,7 +91,7 @@ class GrammarCheckerApp(QMainWindow):
         # Create app description
         description_label = QLabel("Start typing below for error-free grammar.", self)
 
-        # Customise app description
+        # Customize app description
         description_font = QFont("Helvetica Neue", 16)
         description_label.setFont(description_font)
         description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -100,7 +122,7 @@ class GrammarCheckerApp(QMainWindow):
             color: black;
             background-color: white;
             border: 0.5px solid #CCCCCC;
-            border-radius: 10px; /* Create rounded corners
+            border-radius: 10px; /* Create rounded corners */
             font-size: 16px;
             margin-left: 30px;
             margin-right: 30px;
@@ -163,7 +185,6 @@ class GrammarCheckerApp(QMainWindow):
         """
         Add a clear all button
         """
-       
         self.clearAll_button = QPushButton("Clear All", self)
     
         # Set the font for the button
@@ -212,7 +233,6 @@ class GrammarCheckerApp(QMainWindow):
         self.main_layout.addLayout(horizontal_container)
 
         # Set the layout for the central widget
-        
         central_widget.setLayout(self.main_layout)
 
     def init_suggestions_container(self):
@@ -239,53 +259,31 @@ class GrammarCheckerApp(QMainWindow):
         self.suggestions_container.setLayout(self.suggestions_container_layout)
         self.suggestions_container.hide()
 
-    # def grammar_checker(self):
-    #     # Dummy tokenizer code
-    #     # needs to go through each sentence individually. Maybe we can seperate using a fullstop
-    #     sentences = nltk.sent_tokenizeself(self.input_text_edit.toPlainText())
-        
-    #     for sentence in sentences:
-    #         result, bad_sentence, good_sentence = check_sentence(sentence) 
-
-    #         if result == gr.CORRECT or result == gr.NO_ERRORS_FOUND:
-    #             pass
-    #         else:
-    #             self.add_suggestions(result)
-
-    #         # if on third sentence, and there's still no error (meaning we've gone through every sentence, call # self.no_errors_message() to show noerrors popup
-
-    # Dummy suggestion code 
     def suggestion(self):
-        
         # Disable "Check Grammar" button and set input box to ReadOnly while returning suggestions
         self.check_button.setEnabled(False)
         self.input_text_edit.setReadOnly(True)
 
         suggestions_text = ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
-        #suggestions_text = []
         incorrect_phrase = "Test 1"
         correct_phrase = "Test 2"
 
         if suggestions_text:
-        # There are suggestions, clear any previous content and show the container
+            # There are suggestions, clear any previous content and show the container
             for suggestion_text in suggestions_text:
                 self.add_suggestions(suggestion_text, incorrect_phrase, correct_phrase)
-                    # Show the container after adding suggestions
+            # Show the container after adding suggestions
             self.suggestions_container.show()
-
         else:
             self.suggestions_container.hide()
             self.no_errors_message()
-            
-    # Method to display a message window when the input is error-free
+
     def no_errors_message(self):
         msg_box = QMessageBox()
         msg_box.setWindowTitle("No Errors Found")
         msg_box.setText("No grammar errors were found in the text.")
         msg_box.exec()
 
-    # Method to add a suggestion to the dynamic suggestion box
-    # Contains a Edit and Reject buttons
     def add_suggestions(self, suggestion_text, incorrect_phrase, correct_phrase):
         suggestion_style = """
             QLabel {
@@ -294,20 +292,11 @@ class GrammarCheckerApp(QMainWindow):
                 margin: 10px;
             }
             """
-       
         suggestions_layout = QHBoxLayout()
-
-        # # Create a separator line (border) under the suggestion
-        # WIP
-        # line = QFrame()
-        # line.setFrameShape(QFrame.Shape.HLine)
-        # line.setFrameShadow(QFrame.Shadow.Sunken)
-        # line.setStyleSheet("background-color: #666666;")
 
         suggestion_label = QLabel(suggestion_text)
         suggestion_label.setStyleSheet(suggestion_style)
 
-        # Create labels for the incorrect and corrected parts
         parts_label = QLabel(f"{incorrect_phrase} --> {correct_phrase}")
         label_font = QFont("Helvetica Neue", 5)
         parts_label.setFont(label_font)
@@ -319,11 +308,9 @@ class GrammarCheckerApp(QMainWindow):
             }
             """)
 
-        # Create a container for the buttons
         button_container = QWidget()
         button_container.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
-        # Button formatting
         suggestion_button = """
             QPushButton {
                 background-color: white;
@@ -339,10 +326,8 @@ class GrammarCheckerApp(QMainWindow):
                 background-color: #EEEEEE;
             }
             """
-        # A suggestion box for each single suggestion
         suggestion_box = QWidget()
 
-        # Accept and reject buttons
         button_font = QFont("Helvetica Neue", 10) 
 
         accept_button = QPushButton("Accept")
@@ -355,7 +340,6 @@ class GrammarCheckerApp(QMainWindow):
         reject_button.setStyleSheet(suggestion_button)
         reject_button.clicked.connect(lambda: self.remove_suggestion(suggestion_box))
     
-        # Add buttons to the button container
         button_layout = QVBoxLayout()
         button_layout.addWidget(accept_button)
         button_layout.addWidget(reject_button)
@@ -366,10 +350,8 @@ class GrammarCheckerApp(QMainWindow):
         suggestions_layout.addWidget(button_container)
         self.suggestions_layout.addWidget(suggestion_box)
 
-        # Add suggestions to layout
         suggestion_box.setLayout(suggestions_layout)
 
-        # Add the suggestions to the suggestions box
         self.suggestions.append(suggestion_box)
         self.suggestions_container_layout.addWidget(suggestion_box)
 
@@ -377,19 +359,16 @@ class GrammarCheckerApp(QMainWindow):
         self.suggestions_layout.removeWidget(suggestion_box)
         suggestion_box.deleteLater()
         self.suggestions.remove(suggestion_box)
-    
-    # Method to clear suggestions when Clear All button is clicked
+
     def clear_all_suggestions(self):
         for suggestion in self.suggestions:
             self.suggestions_container_layout.removeWidget(suggestion)
             suggestion.deleteLater()
         self.suggestions.clear()
-        
-        # Enable "Check Grammar" button and disable input box to ReadOnly when user clears suggestions
+
         self.check_button.setEnabled(True)
         self.input_text_edit.setReadOnly(False)
-       
-    # Method to clear text from input box
+
     def clear_text(self):
         self.input_text_edit.clear()
         self.clear_all_suggestions()
