@@ -91,12 +91,13 @@ class GrammarCheckerApp(QMainWindow):
         )
 
         # Roné, if you see this, please check how you think this looks with and without the shading by uncommenting the code below :) I'm torn. Lmk what you think
-        # input_area_shadow = QGraphicsDropShadowEffect(self)
-        # input_area_shadow.setColor(QColor(128, 128, 128, 128))
-        # input_area_shadow.setBlurRadius(40)
-        # input_area_shadow.setXOffset(7)
-        # input_area_shadow.setYOffset(7)
-        # self.input_text_edit.setGraphicsEffect(input_area_shadow)
+        # Genévieve, I like the shading and uncommented it but let me know if you prefer it without.
+        input_area_shadow = QGraphicsDropShadowEffect(self)
+        input_area_shadow.setColor(QColor(128, 128, 128, 128))
+        input_area_shadow.setBlurRadius(40)
+        input_area_shadow.setXOffset(7)
+        input_area_shadow.setYOffset(7)
+        self.input_text_edit.setGraphicsEffect(input_area_shadow)
 
         input_layout.addWidget(self.input_text_edit, alignment=Qt.AlignmentFlag.AlignCenter)
 
