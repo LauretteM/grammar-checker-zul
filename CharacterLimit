@@ -4,7 +4,7 @@ class CharacterLimitedTextEdit(QTextEdit):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMaximumBlockCount(1)  # Allow only one line of text
-        self.setMaximumCharacterCount(1000)  # Set the maximum character count
+        self.setMaximumCharacterCount(50)  # Set the maximum character count
         self.word_limit_exceeded = False  # Track whether the word limit is exceeded
 
     def keyPressEvent(self, event):
@@ -12,7 +12,7 @@ class CharacterLimitedTextEdit(QTextEdit):
         current_text = self.toPlainText()
 
         # Check if the current text plus the new input will exceed the character limit
-        if len(current_text) + len(event.text()) <= 1000:
+        if len(current_text) + len(event.text()) <= 50:
             # Allow the key press if it doesn't exceed the limit
             super().keyPressEvent(event)
             
