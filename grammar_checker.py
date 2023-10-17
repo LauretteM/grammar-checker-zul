@@ -43,7 +43,10 @@ def get_first_parses(sentence: str,n=3):
     return parses
 
 def get_first_child(chunk_expr):
-    return an.children_trees(chunk_expr)[0]
+    children = an.children_trees(chunk_expr)
+    if len(children) > 0:
+        return children[0]
+    return None
 
 def adjacent_chunks_of_cat(chunks: list,cat_list1: 'list[str]',cat_list2: 'list[str]'):
     for i in range(len(chunks)-1):

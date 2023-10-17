@@ -3,48 +3,25 @@ import nltk
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QGraphicsDropShadowEffect, QMessageBox, QGroupBox, QSizePolicy, QFrame
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtCore import Qt
-from nltk.tokenize import sent_tokenize, word_tokenize
-from enum import Enum
+import nltk
+import requests
+from grammar_checker import check_sentence
 
-# Download NLTK data
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
+# # Download NLTK data
+# nltk.download('punkt')
+# nltk.download('averaged_perceptron_tagger')
 
-# Error checking the downloads
-try:
-    nltk.download('punkt')
-    nltk.download('averaged_perceptron_tagger')
-except Exception as e:
-    print("Error occurred during NLTK data download:", e)
-    
-# tokenize the input text into sentences
-def tokenize_and_tag(input_text):
-    sentences = sent_tokenize(input_text)
-    
-    # Tokenize each sentence into words and perform part-of-speech tagging
-    tokenized_and_tagged_text = []
-    for sentence in sentences:
-        words = word_tokenize(sentence)
-        pos_tags = nltk.pos_tag(words) # perform part-of-speech tagging
-        tokenized_and_tagged_text.append(pos_tags)
-    
-    return tokenized_and_tagged_text
+# # Error checking the downloads
+# try:
+#     nltk.download('punkt')
+#     nltk.download('averaged_perceptron_tagger')
+# except Exception as e:
+#     print("Error occurred during NLTK data download:", e)
 
-class GrammarResult(Enum):
-    CORRECT = "This sentence looks good."
-    NO_ERRORS_FOUND = "Could not identify agreement errors."
 
-    QUAL_ADJ_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying adjective."
-    QUAL_ID_NP_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying noun."
-    QUAL_ASSOC_NP_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying associative noun."
-    QUAL_LOC_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying locative expression."
-    QUAL_VERB_AGREEMENT = "Check the agreement between the noun/pronoun and its qualifying verb phrase."
+ACCEPT = 'accept'
+REJECT = 'reject'
     
-    SUBJ_ADJ_AGREEMENT = "Check the agreement between the noun/pronoun and the predicative adjective."
-    SUBJ_ID_NP_AGREEMENT = "Check the agreement between the noun/pronoun and the predicate noun."
-    SUBJ_ASSOC_NP_AGREEMENT = "Check the agreement between the noun/pronoun and the associative noun."
-    SUBJ_LOC_AGREEMENT = "Check the agreement between the noun/pronoun and the locative predicate."
-    SUBJ_VERB_AGREEMENT = "Check the agreement between the subject and verb."
 
 class GrammarCheckerApp(QMainWindow):
     def __init__(self):
@@ -264,19 +241,31 @@ class GrammarCheckerApp(QMainWindow):
         self.check_button.setEnabled(False)
         self.input_text_edit.setReadOnly(True)
 
-        suggestions_text = ["Suggestion 1", "Suggestion 2", "Suggestion 3"]
-        incorrect_phrase = "Test 1"
-        correct_phrase = "Test 2"
+        input_text = self.input_text_edit.toPlainText()
+        sentences = nltk.sent_tokenize(input_text)
+        decap_sentences = []
+        for s in sentences:
+            decap_s = s[0].lower() + s[1:]
+            decap_sentences.append((s,decap_s))
 
-        if suggestions_text:
-            # There are suggestions, clear any previous content and show the container
-            for suggestion_text in suggestions_text:
-                self.add_suggestions(suggestion_text, incorrect_phrase, correct_phrase)
-            # Show the container after adding suggestions
-            self.suggestions_container.show()
-        else:
-            self.suggestions_container.hide()
-            self.no_errors_message()
+        print(decap_sentences)
+
+        suggestions_text = []
+
+        for s,d in decap_sentences:
+            s_result = check_sentence(d)
+            print(s_result)
+            suggestions_text.append(s_result)
+
+            if suggestions_text:
+                # There are suggestions, clear any previous content and show the container
+                self.add_suggestions(s_result[0].value, s_result[1], s_result[2],s)
+                # Show the container after adding suggestions
+                self.suggestions_container.show()
+            else:
+                self.suggestions_container.hide()
+                self.no_errors_message()
+        
 
     def no_errors_message(self):
         msg_box = QMessageBox()
@@ -284,7 +273,7 @@ class GrammarCheckerApp(QMainWindow):
         msg_box.setText("No grammar errors were found in the text.")
         msg_box.exec()
 
-    def add_suggestions(self, suggestion_text, incorrect_phrase, correct_phrase):
+    def add_suggestions(self, suggestion_text, incorrect_phrase, correct_phrase, user_sentence):
         suggestion_style = """
             QLabel {
                 color: #333333;
@@ -333,7 +322,7 @@ class GrammarCheckerApp(QMainWindow):
         accept_button = QPushButton("Accept")
         accept_button.setFont(button_font)
         accept_button.setStyleSheet(suggestion_button)
-        accept_button.clicked.connect(lambda: None)          
+        accept_button.clicked.connect(lambda: self.accept_suggestion(user_sentence,correct_phrase,incorrect_phrase))      # should call accept_suggestion     
         
         reject_button = QPushButton("Reject")
         reject_button.setFont(button_font)
@@ -354,6 +343,20 @@ class GrammarCheckerApp(QMainWindow):
 
         self.suggestions.append(suggestion_box)
         self.suggestions_container_layout.addWidget(suggestion_box)
+
+    # to retrieve harvest, get https://ngiyaqonda-nlg.qfrency.com/retrieve_harvest
+    def submit_suggestion(self,user_sentence=None,correct=None,incorrect=None,user_classification=None):
+        user_sentence_html = 'user_sentence='+user_sentence.replace(' ','+')+'&' if user_sentence else ''
+        correct_html = 'correct='+correct.replace(' ','+')+'&' if correct else ''
+        incorrect_html = 'incorrect='+incorrect.replace(' ','+')+'&' if incorrect else '' 
+        user_classification_html = 'user_classification='+user_classification.replace(' ','+') if user_classification else ''
+        url = f'https://ngiyaqonda-nlg.qfrency.com/harvest?{user_sentence_html}{correct_html}{incorrect_html}{user_classification_html}'
+        print(url)
+        requests.get(url)
+
+    def accept_suggestion(self,user_sentence=None,correct=None,incorrect=None):
+        # turn button green and disable?
+        self.submit_suggestion(user_sentence,correct,incorrect,ACCEPT)
 
     def remove_suggestion(self, suggestion_box):
         self.suggestions_layout.removeWidget(suggestion_box)
