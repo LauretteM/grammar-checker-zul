@@ -247,13 +247,18 @@ class GrammarCheckerApp(QMainWindow):
         suggestions_text = []
 
         for s,d in decap_sentences:
-            s_result = check_sentence(d)
+            sentence_html = d.replace(' ','+')
+            url = f'https://ngiyaqonda-nlg.qfrency.com/check_sentence?sentence={sentence_html}'
+            print(url)
+            r = requests.get(url)
+            s_result = r.json()
+            # s_result = check_sentence(d)
             print(s_result)
             suggestions_text.append(s_result)
 
             if suggestions_text:
                 # There are suggestions, clear any previous content and show the container
-                self.add_suggestions(s_result[0].value, s_result[1], s_result[2],s)
+                self.add_suggestions(s_result['suggestion'], s_result['incorrect'], s_result['correct'],s)
                 # Show the container after adding suggestions
                 self.suggestions_container.show()
             else:
