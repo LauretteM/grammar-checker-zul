@@ -77,8 +77,7 @@ class GrammarCheckerApp(QMainWindow):
             QLabel {
                 color: black;                
             }
-            """
-        )
+            """)
 
         # Create a container for input-related items
         input_container = QGroupBox()
@@ -155,14 +154,13 @@ class GrammarCheckerApp(QMainWindow):
             QPushButton:hover {
                 background-color: #666666;
             }
-            """
-        )
+            """)
         self.check_button.clicked.connect(self.suggestion)
 
         """
         Add a clear all button
         """
-        self.clearAll_button = QPushButton("Clear All", self)
+        self.clearAll_button = QPushButton("Clear all", self)
     
         # Set the font for the button
         button_font = QFont("Helvetica Neue", 16)
@@ -180,14 +178,11 @@ class GrammarCheckerApp(QMainWindow):
                 margin-right: 300px;
                 margin-bottom: 20px;
                 margin-top: 0px;
-
             }
-
             QPushButton:hover {
                 background-color: #BBBBBB;
             }
-            """
-        )
+            """)
         self.clearAll_button.clicked.connect(self.clear_text)
 
         buttons_layout.addWidget(self.check_button, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -231,8 +226,7 @@ class GrammarCheckerApp(QMainWindow):
                 margin-top: 5px;
 
             }
-            """
-        )
+            """)
         self.suggestions_container.setLayout(self.suggestions_container_layout)
         self.suggestions_container.hide()
 
@@ -277,23 +271,25 @@ class GrammarCheckerApp(QMainWindow):
         suggestion_style = """
             QLabel {
                 color: #333333;
-                font-size: 14px;
-                margin: 10px;
+                font-size: 13px;
+                margin: 5px 10px 0 10px;
             }
             """
         suggestions_layout = QHBoxLayout()
 
         suggestion_label = QLabel(suggestion_text)
         suggestion_label.setStyleSheet(suggestion_style)
+        suggestion_label.setWordWrap(True)
 
         parts_label = QLabel(f"{incorrect_phrase} --> {correct_phrase}")
+        parts_label.setWordWrap(True)
         label_font = QFont("Helvetica Neue", 5)
         parts_label.setFont(label_font)
         parts_label.setStyleSheet("""
             QLabel {
                 color: #333333;
                 font-size: 11px;
-                margin: 10px;
+                margin: 10px 10px 5px 10px;
             }
             """)
 
@@ -319,23 +315,47 @@ class GrammarCheckerApp(QMainWindow):
 
         button_font = QFont("Helvetica Neue", 10) 
 
-        accept_button = QPushButton("Accept")
-        accept_button.setFont(button_font)
-        accept_button.setStyleSheet(suggestion_button)
-        accept_button.clicked.connect(lambda: self.accept_suggestion(user_sentence,correct_phrase,incorrect_phrase))      # should call accept_suggestion     
+        self.accept_button = QPushButton("Accept")
+        self.accept_button.setFont(button_font)
+        self.accept_button.setStyleSheet(suggestion_button)
+        self.accept_button.clicked.connect(lambda: self.accept_suggestion(user_sentence,correct_phrase,incorrect_phrase))      # should call accept_suggestion     
         
         reject_button = QPushButton("Reject")
         reject_button.setFont(button_font)
         reject_button.setStyleSheet(suggestion_button)
         reject_button.clicked.connect(lambda: self.remove_suggestion(suggestion_box))
+
+        # A container for the suggestion and correct/incorrect phrase
+        suggestion_correction_container = QGroupBox() 
+        suggestion_correction_container.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed) #**
+        suggestion_correction_container.setFixedWidth(350) 
+        suggestion_correction_container.setFixedHeight(110) 
+        suggestion_correction_container.setStyleSheet(
+            """
+            QGroupBox {
+                background-color: white;
+                border: 1px solid #CCCCCC;
+                border-radius: 10px;
+                padding: 0px;
+                margin-left: 20px;
+                margin-right: 20px;
+                margin-bottom: 5px;
+                margin-top: 5px;
+
+            }
+            """)
+
+        suggestion_correction_layout = QVBoxLayout()
+        suggestion_correction_layout.addWidget(suggestion_label)
+        suggestion_correction_layout.addWidget(parts_label)
+        suggestion_correction_container.setLayout(suggestion_correction_layout)
     
         button_layout = QVBoxLayout()
-        button_layout.addWidget(accept_button)
+        button_layout.addWidget(self.accept_button)
         button_layout.addWidget(reject_button)
         button_container.setLayout(button_layout)
         
-        suggestions_layout.addWidget(suggestion_label)
-        suggestions_layout.addWidget(parts_label)
+        suggestions_layout.addWidget(suggestion_correction_container)
         suggestions_layout.addWidget(button_container)
         self.suggestions_layout.addWidget(suggestion_box)
 
@@ -344,7 +364,7 @@ class GrammarCheckerApp(QMainWindow):
         self.suggestions.append(suggestion_box)
         self.suggestions_container_layout.addWidget(suggestion_box)
 
-    # to retrieve harvest, get https://ngiyaqonda-nlg.qfrency.com/retrieve_harvest
+    # To retrieve harvest, get https://ngiyaqonda-nlg.qfrency.com/retrieve_harvest
     def submit_suggestion(self,user_sentence=None,correct=None,incorrect=None,user_classification=None):
         user_sentence_html = 'user_sentence='+user_sentence.replace(' ','+')+'&' if user_sentence else ''
         correct_html = 'correct='+correct.replace(' ','+')+'&' if correct else ''
@@ -355,8 +375,22 @@ class GrammarCheckerApp(QMainWindow):
         requests.get(url)
 
     def accept_suggestion(self,user_sentence=None,correct=None,incorrect=None):
-        # turn button green and disable?
         self.submit_suggestion(user_sentence,correct,incorrect,ACCEPT)
+
+        # Turn accept button black and disable once clicked
+        self.accept_button.setStyleSheet(           
+            """
+            QPushButton {
+                background-color: black;
+                color: white;
+                border: 1px inset #666666;
+                border-radius: 10px;
+                padding: 10px 10px;
+                margin-left: 2px;
+                margin-right: 10px;
+            }
+            """)
+        self.accept_button.setEnabled(False)
 
     def remove_suggestion(self, suggestion_box):
         self.suggestions_layout.removeWidget(suggestion_box)
